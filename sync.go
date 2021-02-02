@@ -341,49 +341,7 @@ func (wallet *Wallet) IsWaiting() bool {
 }
 
 func (wallet *Wallet) IsSynced() bool {
-	chainClient := wallet.internal.ChainClient()
-	if chainClient == nil {
-		log.Info("Chain client nil")
-		return false
-	}
-
-	// Grab the best chain state the wallet is currently aware of.
-	syncState := wallet.internal.Manager.SyncedTo()
-
-	// Next, query the chain backend to grab the info about the tip of the
-	// main chain.
-	bestHash, bestHeight, err := chainClient.GetBestBlock()
-	if err != nil {
-		log.Error(err)
-		return false
-	}
-
-	// If the wallet hasn't yet fully synced to the node's best chain tip,
-	// then we're not yet fully synced.
-	if syncState.Height < bestHeight || !wallet.internal.ChainSynced() {
-		// log.Infof("Wallet Not Synced: %v, %d < %d", wallet.internal.ChainSynced(), syncState.Height, bestHeight)
-		return false
-	}
-
-	// If the wallet is on par with the current best chain tip, then we
-	// still may not yet be synced as the chain backend may still be
-	// catching up to the main chain. So we'll grab the block header in
-	// order to make a guess based on the current time stamp.
-	blockHeader, err := chainClient.GetBlockHeader(bestHash)
-	if err != nil {
-		log.Error(err)
-		return false
-	}
-
-	// If the timestamp on the best header is more than 2 hours in the
-	// past, then we're not yet synced.
-	minus24Hours := time.Now().Add(-2 * time.Hour)
-	if blockHeader.Timestamp.Before(minus24Hours) {
-		log.Info("Low timestamp")
-		return false
-	}
-
-	return true
+	return wallet.internal.ChainSynced()
 }
 
 func (wallet *Wallet) IsSyncing() bool {

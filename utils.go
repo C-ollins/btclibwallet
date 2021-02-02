@@ -107,7 +107,7 @@ func GenerateSeed() (string, error) {
 		return "", err
 	}
 
-	return hex.EncodeToString(seed), nil
+	return EncodeMnemonic(seed), nil
 }
 
 // ExtractDateOrTime returns the date represented by the timestamp as a date string if the timestamp is over 24 hours ago.

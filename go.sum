@@ -1,6 +1,6 @@
 cloud.google.com/go v0.26.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
-github.com/C-ollins/btcwallet v0.0.0-20201029044811-48cd7e4cb442 h1:sreS1ave+vGmHzn/yRCztONHyMGiBxUsxLbakwT1Xjc=
-github.com/C-ollins/btcwallet v0.0.0-20201029044811-48cd7e4cb442/go.mod h1:qtPAohN1ioo0pvJt/j7bZM8ANBWlYWVCVFL0kkijs7s=
+github.com/C-ollins/btcwallet v0.0.0-20210202144357-a5c58ae1ff51 h1:69x9MEdkADW3mOv2LynZ5WqVedEoAF4k6/tzUFUmO5o=
+github.com/C-ollins/btcwallet v0.0.0-20210202144357-a5c58ae1ff51/go.mod h1:qtPAohN1ioo0pvJt/j7bZM8ANBWlYWVCVFL0kkijs7s=
 github.com/C-ollins/neutrino v0.11.1-0.20201028075217-1535c1765f1a h1:K7OE628QRHMYYj7Z5Pe4rBJL5Q7fjZ5gMtDDNDvaGE0=
 github.com/C-ollins/neutrino v0.11.1-0.20201028075217-1535c1765f1a/go.mod h1:MlZmoKa7CJP3eR1s5yB7Rm5aSyadpKkxqAwLQmog7N0=
 github.com/DataDog/zstd v1.3.5 h1:DtpNbljikUepEPD16hD4LvIcmhnhdLTiW/5pHgbmp14=

@@ -38,6 +38,7 @@ type NeutrinoClient struct {
 	rescanning              bool
 	lastFilteredBlockHeader *wire.BlockHeader
 	scanStartBlock          waddrmgr.BlockStamp
+	scanEndBlock            headerfs.BlockStamp
 	currentBlock            *waddrmgr.BlockStamp
 
 	quit       chan struct{}
@@ -181,24 +182,25 @@ func (s *NeutrinoClient) StartupSync() error {
 	s.clientMtx.Lock()
 
 	s.scanStartBlock = s.wallet.Manager.SyncedTo()
+	s.scanEndBlock = *bestBlock
 	s.walletSynced = false
 	s.rescanning = false
 	s.lastFilteredBlockHeader = nil
 	s.rescanQuit = make(chan struct{})
 	s.clientMtx.Unlock()
 
-	header, err := s.CS.GetBlockHeader(&bestBlock.Hash)
+	endBlockHeader, err := s.CS.GetBlockHeader(&s.scanEndBlock.Hash)
 	if err != nil {
 		return fmt.Errorf("can't get block header for hash %v: %s",
 			bestBlock.Hash, err)
 	}
 
 	s.clientMtx.Lock()
-	s.currentBlock = &waddrmgr.BlockStamp{Height: bestBlock.Height, Hash: header.BlockHash(), Timestamp: header.Timestamp}
-	log.Infof("Sync starting Start height: %d, Bestblock: %d", s.scanStartBlock.Height, bestBlock.Height)
+	s.currentBlock = &waddrmgr.BlockStamp{Height: bestBlock.Height, Hash: endBlockHeader.BlockHash(), Timestamp: endBlockHeader.Timestamp}
+	log.Infof("Sync starting Start height: %d, End: %d, Bestblock: %d", s.scanStartBlock.Height, s.scanEndBlock.Height, bestBlock.Height)
 	s.clientMtx.Unlock()
 
-	if header.BlockHash() == s.scanStartBlock.Hash {
+	if endBlockHeader.BlockHash() == s.scanStartBlock.Hash {
 		log.Info("Start hash and end hash is equal, quiting rescan")
 
 		s.wallet.SetChainSynced(true)
@@ -488,6 +490,7 @@ func (s *NeutrinoClient) Rescan(startHeight int64) error {
 
 	s.clientMtx.Lock()
 	s.scanStartBlock = startBlockStamp
+	s.scanEndBlock = *bestBlock
 	s.clientMtx.Unlock()
 
 	log.Infof("Rescan starting Start height: %d, Bestblock height: %d", startBlockStamp.Height, bestBlock.Hash)
@@ -629,15 +632,13 @@ func (s *NeutrinoClient) onBlockConnected(hash *chainhash.Hash, height int32, bl
 			log.Errorf("Error catching up hashes: %v", err)
 		}
 
-		log.Info("Wallet caught up to:", height)
-
-		if height%5000 == 0 {
+		if height%1000 == 0 {
 			log.Info("Rescanned to block:", height)
 			s.rescanProgress(height)
 		}
 	}
 	s.clientMtx.Lock()
-	if height < s.scanStartBlock.Height {
+	if height < s.scanEndBlock.Height {
 		s.clientMtx.Unlock()
 		sendRescanProgress()
 	} else {

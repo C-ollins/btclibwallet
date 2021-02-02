@@ -2,7 +2,6 @@ package btclibwallet
 
 import (
 	"context"
-	"encoding/hex"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -125,17 +124,16 @@ func (wallet *Wallet) WalletExists() (bool, error) {
 	return wallet.loader.WalletExists()
 }
 
-func (wallet *Wallet) createWallet(privatePassphrase, seedHex string) error {
+func (wallet *Wallet) createWallet(privatePassphrase, seedMnemonic string) error {
 	log.Info("Creating Wallet")
-	if len(seedHex) == 0 {
+	if len(seedMnemonic) == 0 {
 		return errors.New(ErrEmptySeed)
 	}
 
 	pubPass := []byte(w.InsecurePubPassphrase)
 	privPass := []byte(privatePassphrase)
-	seed, err := hex.DecodeString(seedHex)
+	seed, err := DecodeUserInput(seedMnemonic)
 	if err != nil {
-		log.Error(err)
 		return err
 	}
 
